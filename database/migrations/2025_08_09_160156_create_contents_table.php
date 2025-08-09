@@ -20,9 +20,9 @@ return new class extends Migration
             $table->integer('likes')->default(0);
             $table->integer('duration')->default(0);
             $table->float('score')->default(0);
-            $table->timestamp('published_at')->nullable();
+            $table->timestamp('published_at');
             $table->json('tags')->nullable();
-            $table->integer('reading_time')->nullable()->after('duration');
+            $table->integer('reading_time')->nullable();
 
             $table->timestamps();
         });
