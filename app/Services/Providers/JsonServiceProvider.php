@@ -24,22 +24,24 @@ class JsonServiceProvider implements ProvidersInterface
             'per_page' => $perPage
         ])->throw()->json();
 
-        return $response->getBody()->getContents();
+        return $response;
     }
 
-    public function normalizeData( $data): array
+    public function normalizeData(array $data): array
     {
-        $decoded = json_decode($data, true);
-
-        if (!isset($decoded['contents']) || !is_array($decoded['contents'])) {
+        if (!isset($data['contents']) || !is_array($data['contents'])) {
             return [];
         }
 
         $normalized = [];
 
-        foreach ($decoded['contents'] as $item) {
+        foreach ($data['contents'] as $item) {
             $type = strtolower($item['type']);
 
+            if( $item['metrics']['duration']){
+                $durationArray = explode(':', $item['metrics']['duration']);
+                $duration = $durationArray[0] * 60 + $durationArray[1];
+            }
             $data = [
                 'external_id'         => $item['id'],
                 'title'               => $item['title'],
@@ -47,21 +49,13 @@ class JsonServiceProvider implements ProvidersInterface
                 'views'               => $item['metrics']['views'] ?? null,
                 'likes'               => $item['metrics']['likes'] ?? null,
                 'reactions'           => $item['metrics']['reactions'] ?? null,
-                'duration' => $item['metrics']['duration'] ?? null,
-                'reading_time'        => null,
-                'source_published_at' => Carbon::parse($item['published_at'])->toDateTimeString(),
+                'duration' => $duration?? null,
+                'reading_time'        => (int)($item['metrics']['reactions'] ?? 0),
+                'published_at' => Carbon::parse($item['published_at'])->toDateTimeString(),
                 'tags'     => $item['tags'] ?? [],
                 
             ];
 
-            if ($type === 'video') {
-                $data['views'] = (int)($item['metrics']['views'] ?? 0);
-                $data['likes'] = (int)($item['metrics']['likes'] ?? 0);
-            } elseif ($type === 'article') {
-                // If JSON provider ever sends articles
-                $data['reading_time'] = (int)($item['metrics']['reading_time'] ?? 0);
-                $data['reactions']    = (int)($item['metrics']['reactions'] ?? 0);
-            }
 
             $normalized[] = $data;
         }

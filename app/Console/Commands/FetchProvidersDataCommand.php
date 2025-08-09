@@ -29,22 +29,28 @@ class FetchProvidersDataCommand extends Command
     public function handle()
     {
         //
-        $providers = \App\Models\Provider::all();
+        $providers = \App\Models\Provider::where("type", "!=", "json")->get();
         foreach ($providers as $provider) {
             $serviceProvider = $provider->type == 'json'? new JsonServiceProvider() : new XmlServiceProvider();
 
             $response = $serviceProvider->fetchData($provider->url);
 
+            $this->info("Provider: {$provider->name} data fetched");
             $data_array = $serviceProvider->normalizeData($response);
 
             foreach($data_array as $dataitem)
             {
                 Content::updateOrCreate(
                     [
-                        
-                    ]
+                        'external_id' => $dataitem['external_id'],
+                        'provider_id' => $provider->id
+                    ],
+                    $dataitem
                     );
             }
+            $this->info("Provider: {$provider->name} data is added to database");
         }
+
+        $this->info("All providers data fetched");
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Content;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -7,5 +8,5 @@ Route::get('/', function () {
 });
 
 Route::get('/hello', function () {
-    return 'hello world';
+    return Content::all();
 });
