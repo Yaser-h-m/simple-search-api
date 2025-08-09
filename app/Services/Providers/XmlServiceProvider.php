@@ -50,7 +50,7 @@ class XmlServiceProvider implements ProvidersInterface
             $data = [
                 'external_id'         => $item['id'],
                 'title'               => $item['headline'],
-                'type'                => $type === 'article' ? 'article' : $type,
+                'type'                => $type,
                 'views'               => $item['stats']['views'] ?? 0,
                 'likes'               => $item['stats']['likes'] ?? 0,
                 'reactions'           => $item['stats']['reactions'] ?? 0,
