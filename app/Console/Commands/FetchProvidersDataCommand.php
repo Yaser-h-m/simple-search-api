@@ -31,10 +31,13 @@ class FetchProvidersDataCommand extends Command
         //
         $providers = \App\Models\Provider::get();
         foreach ($providers as $provider) {
-            $serviceProvider = $provider->type == 'json' ? new JsonServiceProvider() : new XmlServiceProvider();
 
-            $response = $serviceProvider->fetchData($provider->url);
+            try{
 
+                $serviceProvider = $provider->type == 'json' ? new JsonServiceProvider() : new XmlServiceProvider();
+                
+                $response = $serviceProvider->fetchData($provider->url);
+                
             $this->info("Provider: {$provider->name} data fetched");
             $data_array = $serviceProvider->normalizeData($response);
 
@@ -52,6 +55,10 @@ class FetchProvidersDataCommand extends Command
                 $content->save();
             }
             $this->info("Provider: {$provider->name} data is added to database");
+            }
+            catch(\Exception $e){
+                $this->error("Provider: {$provider->name} data fetching failed");
+            }
         }
 
         $this->info("All providers data fetched");

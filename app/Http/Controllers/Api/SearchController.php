@@ -18,11 +18,12 @@ class SearchController extends Controller
         $q = $request->query('q');
         $type = $request->query('type'); 
         $sort = $request->query('sort', 'score'); 
+        $sortDirection = $request->query('direction', 'desc');
         $perPage = (int)$request->query('per_page', 10);
 
-        $cacheKey = 'search:' .$q . '|' . $type . '|' . $sort . '|' . $perPage . '|' . $request->query('page', 1);
+        $cacheKey = 'search:' .$q . '|' . $type . '|' . $sort . '|' . $sortDirection .'|' . $perPage . '|' . $request->query('page', 1);
 
-        $results = Cache::store('redis')->remember($cacheKey, now()->addMinutes(5), function () use ($q, $type, $sort, $perPage) {
+        $results = Cache::store('redis')->remember($cacheKey, now()->addMinutes(5), function () use ($q, $type, $sort, $perPage, $sortDirection) {
             $query = Content::query();
 
             if ($type) {
@@ -36,7 +37,7 @@ class SearchController extends Controller
             }
 
             if ($sort === 'score') {
-                $query->orderByDesc('score');
+                $query->orderBy('score', $sortDirection);
             } elseif ($sort === 'relevance' && $q) {
                 //todo: implement relevance
                 $query->orderByDesc('score');

@@ -10,6 +10,4 @@ Route::get('/', function () {
 
 
 Route::get('/dashboard', [DashboardController::class, 'index']);
-Route::get('/hello', function () {
-    return Content::all();
-});
+Route::get('/content', [DashboardController::class, 'content']);
