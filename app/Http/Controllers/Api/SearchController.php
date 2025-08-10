@@ -38,7 +38,7 @@ class SearchController extends Controller
             if ($sort === 'score') {
                 $query->orderByDesc('score');
             } elseif ($sort === 'relevance' && $q) {
-                // For now, relevance is same as score, but can be improved later
+                //todo: implement relevance
                 $query->orderByDesc('score');
             }
 
